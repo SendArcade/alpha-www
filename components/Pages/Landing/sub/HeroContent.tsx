@@ -6,7 +6,7 @@ import {
   slideInFromLeft,
   slideInFromRight,
   slideInFromTop,
-} from "@/utils/motion";
+} from "@/lib/utils/motion";
 import Image from "next/image";
 
 const HeroContent = () => {
@@ -58,12 +58,7 @@ const HeroContent = () => {
           animate={{ y: [0, -20, 0] }}
           transition={{ repeat: Infinity, duration: 3 }}
         >
-          <Image
-            src="/3.png"
-            alt="floating image 1"
-            width={350}
-            height={500}
-          />
+          <Image src="/3.png" alt="floating image 1" width={350} height={500} />
         </motion.div>
 
         {/* Floating image 2 */}
@@ -73,12 +68,7 @@ const HeroContent = () => {
           animate={{ y: [0, -30, 0] }}
           transition={{ repeat: Infinity, duration: 4 }}
         >
-          <Image
-            src="/1.png"
-            alt="floating image 2"
-            width={500}
-            height={500}
-          />
+          <Image src="/1.png" alt="floating image 2" width={500} height={500} />
         </motion.div>
 
         {/* Floating image 3 */}
@@ -88,12 +78,7 @@ const HeroContent = () => {
           animate={{ y: [0, -25, 0] }}
           transition={{ repeat: Infinity, duration: 5 }}
         >
-          <Image
-            src="/2.png"
-            alt="floating image 3"
-            width={500}
-            height={500}
-          />
+          <Image src="/2.png" alt="floating image 3" width={500} height={500} />
         </motion.div>
 
         {/* Floating image 4 */}
@@ -103,12 +88,7 @@ const HeroContent = () => {
           animate={{ y: [0, -35, 0] }}
           transition={{ repeat: Infinity, duration: 6 }}
         >
-          <Image
-            src="/4.png"
-            alt="floating image 4"
-            width={500}
-            height={500}
-          />
+          <Image src="/4.png" alt="floating image 4" width={500} height={500} />
         </motion.div>
 
         {/* Floating image 5 */}
@@ -118,12 +98,7 @@ const HeroContent = () => {
           animate={{ y: [0, -28, 0] }}
           transition={{ repeat: Infinity, duration: 5.5 }}
         >
-          <Image
-            src="/5.png"
-            alt="floating image 5"
-            width={500}
-            height={500}
-          />
+          <Image src="/5.png" alt="floating image 5" width={500} height={500} />
         </motion.div>
       </motion.div>
     </motion.div>
