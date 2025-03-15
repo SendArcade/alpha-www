@@ -33,7 +33,7 @@ const Navbar = () => {
       <div className="w-full h-full flex flex-row items-center justify-between m-auto px-[10px]">
         <Link href="/" className="h-auto w-auto flex flex-row items-center">
           <Image
-            src="/send_arcade_logo.svg"
+            src="/alpha_logo.svg"
             alt="logo"
             width={50}
             height={50}
@@ -41,7 +41,7 @@ const Navbar = () => {
           />
 
           <span className="font-bold ml-[10px] hidden md:block text-gray-300">
-            Send Arcade Alpha
+            Alpha
           </span>
         </Link>
 

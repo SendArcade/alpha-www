@@ -9,7 +9,7 @@ import Providers from "@/app/providers/Providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Send Arcade Alpha",
+  title: "Alpha",
   description: "Low-Code Solana, High-Speed Innovation",
 };
 

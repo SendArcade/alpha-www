@@ -7,8 +7,9 @@ import {
 import { Project } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
+
 import { useState, useEffect, useCallback } from "react";
-import { Trash2, ThumbsUp, ThumbsDown, MessageCircle } from "lucide-react";
+import { Trash2, ThumbsUp, ThumbsDown, MessageCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -228,78 +229,88 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
   return (
     <>
       <div className="w-full max-w-[350px]">
-        <Link href={`/dashboard/projects/${project.id}`}>
-          <Card className="bg-[#0a0118] border border-white/10 overflow-hidden hover:border-white/20 transition-all relative">
-            <div className="relative w-full h-48 overflow-hidden">
-              <Image
-                src={project.imageUrl || "/placeholder-game.jpg"}
-                alt={project.title}
-                fill
-                className="object-cover"
-              />
+        <Card className="bg-[#0a0118] border border-white/10 overflow-hidden hover:border-white/20 transition-all relative">
+          <div className="relative w-full h-48 overflow-hidden">
+            <Image
+              src={project.imageUrl || "/placeholder-game.jpg"}
+              alt={project.title}
+              fill
+              className="object-cover"
+            />
+          </div>
+          <CardContent className="p-4">
+            <h3 className="text-lg font-semibold text-white line-clamp-2 mb-1">
+              {project.title.length > 30
+                ? `Project Name with a long long long long long long name`
+                : project.title}
+            </h3>
+            <div className="flex items-center gap-2 mt-2">
+              <div className="w-6 h-6 rounded-full bg-[#2A0E61] flex items-center justify-center overflow-hidden">
+                {project.user.image ? (
+                  <Image
+                    src={project.user.image}
+                    alt={project.user.name || "Creator"}
+                    width={24}
+                    height={24}
+                    className="object-cover"
+                  />
+                ) : (
+                  <span className="text-xs text-white">
+                    {project.user.name?.charAt(0)?.toUpperCase() || "U"}
+                  </span>
+                )}
+              </div>
+              <span className="text-sm text-gray-400">Creator Name</span>
+              <span className="text-sm text-gray-400 ml-auto">
+                {formattedDate}
+              </span>
             </div>
-            <CardContent className="p-4">
-              <h3 className="text-lg font-semibold text-white line-clamp-2 mb-1">
-                {project.title.length > 30
-                  ? `Project Name with a long long long long long long name`
-                  : project.title}
-              </h3>
-              <div className="flex items-center gap-2 mt-2">
-                <div className="w-6 h-6 rounded-full bg-[#2A0E61] flex items-center justify-center overflow-hidden">
-                  {project.user.image ? (
-                    <Image
-                      src={project.user.image}
-                      alt={project.user.name || "Creator"}
-                      width={24}
-                      height={24}
-                      className="object-cover"
-                    />
-                  ) : (
-                    <span className="text-xs text-white">
-                      {project.user.name?.charAt(0)?.toUpperCase() || "U"}
-                    </span>
-                  )}
-                </div>
-                <span className="text-sm text-gray-400">Creator Name</span>
-                <span className="text-sm text-gray-400 ml-auto">
-                  {formattedDate}
-                </span>
-              </div>
-            </CardContent>
-            <CardFooter className="p-4 pt-0 flex justify-between">
-              <div className="flex gap-2">
+          </CardContent>
+          <CardFooter className="p-4 pt-0 flex justify-between">
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`p-1 ${
+                  liked ? "text-green-500" : "text-gray-400"
+                } hover:text-green-500`}
+                onClick={handleLike}
+              >
+                <ThumbsUp className="h-5 w-5" />
+                <span className="ml-1">{likesCount}</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`p-1 ${
+                  disliked ? "text-red-500" : "text-gray-400"
+                } hover:text-red-500`}
+                onClick={handleDislike}
+              >
+                <ThumbsDown className="h-5 w-5" />
+                <span className="ml-1">{dislikesCount}</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-1 text-gray-400 hover:text-blue-500"
+                onClick={handleCommentToggle}
+              >
+                <MessageCircle className="h-5 w-5" />
+                <span className="ml-1">{comments.length}</span>
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Link href={`/dashboard/projects/${project.id}`} passHref>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  className={`p-1 ${
-                    liked ? "text-green-500" : "text-gray-400"
-                  } hover:text-green-500`}
-                  onClick={handleLike}
+                  className="flex items-center gap-1 bg-[#2A0E61] hover:bg-[#3a1e71] text-white border-none"
                 >
-                  <ThumbsUp className="h-5 w-5" />
-                  <span className="ml-1">{likesCount}</span>
+                  <Eye className="h-4 w-4" />
+                  <span>View</span>
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`p-1 ${
-                    disliked ? "text-red-500" : "text-gray-400"
-                  } hover:text-red-500`}
-                  onClick={handleDislike}
-                >
-                  <ThumbsDown className="h-5 w-5" />
-                  <span className="ml-1">{dislikesCount}</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="p-1 text-gray-400 hover:text-blue-500"
-                  onClick={handleCommentToggle}
-                >
-                  <MessageCircle className="h-5 w-5" />
-                  <span className="ml-1">{comments.length}</span>
-                </Button>
-              </div>
+              </Link>
               <Button
                 variant="destructive"
                 size="sm"
@@ -311,9 +322,9 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
               >
                 <Trash2 className="h-5 w-5" />
               </Button>
-            </CardFooter>
-          </Card>
-        </Link>
+            </div>
+          </CardFooter>
+        </Card>
       </div>
 
       {/* Delete Confirmation Dialog */}

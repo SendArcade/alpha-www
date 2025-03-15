@@ -149,7 +149,7 @@ export function CreateProjectModal({
               }
               placeholder="Enter a descriptive title"
               required
-              className="border-white/10 bg-white/5 focus:border-blue-500/50 focus:ring-blue-500/30"
+              className="border-white/10 bg-white/5 focus:border-blue-500/50 text-white focus:ring-blue-500/30"
             />
           </div>
 
@@ -169,7 +169,7 @@ export function CreateProjectModal({
               }
               placeholder="Describe your project"
               required
-              className="min-h-[100px] border-white/10 bg-white/5 focus:border-blue-500/50 focus:ring-blue-500/30"
+              className="min-h-[100px] text-white border-white/10 bg-white/5 focus:border-blue-500/50 focus:ring-blue-500/30"
             />
           </div>
 
@@ -189,7 +189,7 @@ export function CreateProjectModal({
               }
               placeholder="URL for project thumbnail"
               required
-              className="border-white/10 bg-white/5 focus:border-blue-500/50 focus:ring-blue-500/30"
+              className="border-white/10 bg-white/5 text-white focus:border-blue-500/50 focus:ring-blue-500/30"
             />
           </div>
 

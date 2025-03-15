@@ -6,11 +6,14 @@ import React, { useState, useRef, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const { data: session } = useSession();
   const [showUserModal, setShowUserModal] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   // Close modal when clicking outside
   useEffect(() => {
@@ -21,6 +24,12 @@ const Navbar = () => {
       ) {
         setShowUserModal(false);
       }
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsMobileMenuOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -30,12 +39,12 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="w-full h-[65px] fixed top-0 shadow-lg  border-b border-white/10 bg-[#0a0118] backdrop-blur-md z-50 px-10">
+    <div className="w-full h-[65px] fixed top-0 shadow-lg border-b border-white/10 bg-[#0a0118] backdrop-blur-md z-50 px-4 md:px-10">
       <div className="w-full h-full flex flex-row items-center justify-between m-auto px-[10px]">
         <div className="flex flex-1 items-center">
           <Link href="/" className="h-auto w-auto flex flex-row items-center">
             <Image
-              src="/send_arcade_logo.svg"
+              src="/alpha_logo.svg"
               alt="logo"
               width={50}
               height={50}
@@ -43,11 +52,13 @@ const Navbar = () => {
             />
 
             <span className="font-bold ml-[10px] hidden md:block text-gray-300">
-              Send Arcade Alpha
+              Alpha
             </span>
           </Link>
         </div>
-        <div className="flex items-center justify-center flex-1">
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center justify-center flex-1">
           <div className="flex items-center justify-between gap-8 px-6 py-2 rounded-full text-gray-200">
             <Link
               href="/docs"
@@ -69,6 +80,56 @@ const Navbar = () => {
             </Link>
           </div>
         </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden text-white p-2 focus:outline-none"
+          onClick={() => {
+            setIsMobileMenuOpen(!isMobileMenuOpen);
+            // Close user modal when toggling mobile menu
+            if (showUserModal) setShowUserModal(false);
+          }}
+          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+        >
+          {isMobileMenuOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <Menu className="w-6 h-6" />
+          )}
+        </button>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div
+            ref={mobileMenuRef}
+            className="absolute top-[65px] left-0 right-0 bg-[#0a0118] border-b border-white/10 p-4 md:hidden shadow-lg"
+          >
+            <div className="flex flex-col space-y-4">
+              <Link
+                href="/docs"
+                className="text-gray-200 hover:text-white transition-colors px-4 py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Docs
+              </Link>
+              <Link
+                href="https://www.thesendcoin.com/"
+                className="text-gray-200 hover:text-white transition-colors px-4 py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                The Send Coin
+              </Link>
+              <Link
+                href="https://github.com/SendArcade/alpha-gui"
+                className="text-gray-200 hover:text-white transition-colors px-4 py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                GitHub
+              </Link>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center gap-4 flex-1 justify-end">
           {session ? (
             <div className="flex items-center gap-4 relative">
