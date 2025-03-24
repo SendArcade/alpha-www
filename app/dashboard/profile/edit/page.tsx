@@ -91,7 +91,7 @@ export default function EditProfilePage() {
                   setFormData({ ...formData, image: e.target.value })
                 }
                 placeholder="Image URL"
-                className="text-black"
+                className="text-white"
               />
               <p className="text-sm text-gray-500 mt-1">
                 Using profile image from {session?.user?.provider || "default"}
@@ -107,7 +107,7 @@ export default function EditProfilePage() {
                 setFormData({ ...formData, name: e.target.value })
               }
               placeholder="Your name"
-              className="text-black"
+              className="text-white"
             />
           </div>
 
@@ -120,6 +120,7 @@ export default function EditProfilePage() {
               }
               placeholder="Tell us about yourself"
               rows={4}
+              className="text-white"
             />
           </div>
 
@@ -131,6 +132,7 @@ export default function EditProfilePage() {
                 setFormData({ ...formData, location: e.target.value })
               }
               placeholder="Your location"
+              className="text-white"
             />
           </div>
 
