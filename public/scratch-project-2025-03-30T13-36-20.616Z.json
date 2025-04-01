@@ -1,0 +1,262 @@
+{
+  "targets": [
+    {
+      "isStage": true,
+      "name": "Stage",
+      "variables": {
+        "score": {
+          "value": 0
+        }
+      },
+      "lists": {},
+      "broadcasts": {},
+      "blocks": [
+        {
+          "opcode": "event_whenflagclicked",
+          "next": null,
+          "parent": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": true
+        },
+        {
+          "opcode": "scene_setbackground",
+          "next": null,
+          "parent": null,
+          "inputs": {
+            "BROADCAST_OPTION": {
+              "type": 10,
+              "value": "backdrop1"
+            }
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": true
+        }
+      ],
+      "comments": [],
+      "currentCostume": 0,
+      "costumes": [
+        {
+          "assetId": "cd21515e2c14b3fe2e80435e8fc1579a",
+          "name": "backdrop1",
+          "md5": "cd21515e2c14b3fe2e80435e8fc1579a.png",
+          "bitmapResolution": 1,
+          "md5ext": "cd21515e2c14b3fe2e80435e8fc1579a.svg"
+        }
+      ],
+      "penLayer": null,
+      "rotationStyle": 2,
+      "scale": 1,
+      "spriteInfo": {
+        "isClone": false
+      },
+      "visible": true,
+      "volume": 100,
+      "x": 240,
+      "y": 180,
+      "videoState": "on",
+      "layerOrder": 0
+    },
+    {
+      "isStage": false,
+      "name": "Fruit",
+      "variables": {
+        "x velocity": {
+          "value": 0
+        },
+        "y velocity": {
+          "value": 0
+        }
+      },
+      "lists": {},
+      "broadcasts": {},
+      "blocks": [
+        {
+          "opcode": "event_whenflagclicked",
+          "next": null,
+          "parent": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": true
+        },
+        {
+          "opcode": "motion_setx",
+          "next": null,
+          "parent": null,
+          "inputs": {
+            "x": {
+              "type": 4,
+              "value": 240
+            }
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": true
+        },
+        {
+          "opcode": "motion_sety",
+          "next": null,
+          "parent": null,
+          "inputs": {
+            "y": {
+              "type": 4,
+              "value": 0
+            }
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": true
+        },
+        {
+          "opcode": "motion_changexby",
+          "next": null,
+          "parent": null,
+          "inputs": {
+            "dx": {
+              "type": 4,
+              "value": 10
+            }
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": true
+        },
+        {
+          "opcode": "motion_changeyby",
+          "next": null,
+          "parent": null,
+          "inputs": {
+            "dy": {
+              "type": 4,
+              "value": 10
+            }
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": true
+        },
+        {
+          "opcode": "control_create_clone_of",
+          "next": null,
+          "parent": null,
+          "inputs": {
+            "CLONE_OPTION": {
+              "type": 10,
+              "value": "_myself_"
+            }
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": true
+        }
+      ],
+      "comments": [],
+      "currentCostume": 0,
+      "costumes": [
+        {
+          "assetId": "5f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f",
+          "name": "apple",
+          "md5": "5f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f.png",
+          "bitmapResolution": 1,
+          "md5ext": "5f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f.svg"
+        }
+      ],
+      "penLayer": null,
+      "rotationStyle": 1,
+      "scale": 1,
+      "spriteInfo": {
+        "isClone": false
+      },
+      "visible": true,
+      "volume": 100,
+      "x": 240,
+      "y": 0,
+      "layerOrder": 1
+    },
+    {
+      "isStage": false,
+      "name": "Sword",
+      "variables": {},
+      "lists": {},
+      "broadcasts": {},
+      "blocks": [
+        {
+          "opcode": "event_whenkeypressed",
+          "next": null,
+          "parent": null,
+          "inputs": {
+            "KEY_OPTION": {
+              "type": 10,
+              "value": "space"
+            }
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": true
+        },
+        {
+          "opcode": "motion_setx",
+          "next": null,
+          "parent": null,
+          "inputs": {
+            "x": {
+              "type": 4,
+              "value": 240
+            }
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": true
+        },
+        {
+          "opcode": "motion_sety",
+          "next": null,
+          "parent": null,
+          "inputs": {
+            "y": {
+              "type": 4,
+              "value": 180
+            }
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": true
+        }
+      ],
+      "comments": [],
+      "currentCostume": 0,
+      "costumes": [
+        {
+          "assetId": "b2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f",
+          "name": "sword",
+          "md5": "b2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f.png",
+          "bitmapResolution": 1,
+          "md5ext": "b2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f.svg"
+        }
+      ],
+      "penLayer": null,
+      "rotationStyle": 1,
+      "scale": 1,
+      "spriteInfo": {
+        "isClone": false
+      },
+      "visible": true,
+      "volume": 100,
+      "x": 240,
+      "y": 180,
+      "layerOrder": 2
+    }
+  ],
+  "monitors": [
+    {
+      "id": "score",
+      "mode": 0,
+      "spriteName": "Stage",
+      "isDisarmed": false
+    }
+  ],
+  "extensions": {}
+}
