@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { Groq } from "groq-sdk";
+import OpenAI from 'openai';
 import fs from 'fs';
 import path from 'path';
 
-// Initialize Groq client
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 // Store the latest JSON response
@@ -125,7 +125,7 @@ export async function POST(req: Request) {
     const exampleJSON = fs.readFileSync(exampleJSONPath, 'utf8');
     console.log('Example JSON:', exampleJSON);  
     
-    // Prepare messages for Groq
+    // Prepare messages for OpenAI
     const messages = [
       {
         role: "system",
@@ -163,36 +163,31 @@ Your response should be ONLY the valid JSON with no explanations or markdown for
 
     // Reset the latest response
     latestJsonResponse = '';
-    // To store complete response
     let fullResponse = '';
 
-    // Start the Groq API call in the background
+    // Start the OpenAI API call in the background
     (async () => {
       try {
-        const chatCompletion = await groq.chat.completions.create({
+        const chatCompletion = await openai.chat.completions.create({
           messages,
-          model: "llama-3.3-70b-versatile",
+          model: "gpt-4-turbo-preview", // or your preferred OpenAI model
           temperature: 0.7,
           top_p: 1,
           stream: true,
-          stop: null,
         });
 
         for await (const chunk of chatCompletion) {
           const content = chunk.choices[0]?.delta?.content || "";
-          // Accumulate the full response
           fullResponse += content;
           await writer.write(encoder.encode(content));
         }
 
         console.log('Response streaming complete, total length:', fullResponse.length);
         
-        // Save the complete response to a file after all chunks are received
         await saveResponseToFile(fullResponse);
-
         await writer.close();
       } catch (error) {
-        console.error("Error in Groq API:", error);
+        console.error("Error in OpenAI API:", error);
         await writer.write(encoder.encode("Sorry, I encountered an error."));
         await writer.close();
       }
