@@ -4,9 +4,9 @@ import fs from "fs";
 import path from "path";
 import AdmZip from "adm-zip";
 
-// Initialize OpenAI client
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENROUTER_API_KEY,
 });
 
 export async function POST(req: Request) {
@@ -14,33 +14,22 @@ export async function POST(req: Request) {
     const { message, sb3Url } = await req.json();
     console.log("Received SB3 URL:", sb3Url);
 
+    let projectJson = "";
     if (sb3Url) {
-      // Remove leading slash if present to form a relative path
-      const relativePath = sb3Url.startsWith("/") ? sb3Url.substring(1) : sb3Url;
-      // Full path of the SB3 file in the public folder
-      const sb3Path = path.join(process.cwd(), "public", relativePath);
-      
+      const relPath = sb3Url.startsWith("/") ? sb3Url.substring(1) : sb3Url;
+      const sb3Path = path.join(process.cwd(), "public", relPath);
       if (fs.existsSync(sb3Path)) {
-        // Rename the file from .sb3 to .zip
         const zipPath = sb3Path.replace(/\.sb3$/, ".zip");
         await fs.promises.rename(sb3Path, zipPath);
-        console.log(`Renamed file to ${zipPath}`);
-
-        // Use AdmZip to open the zip file and extract project.json
+        console.log("Renamed file to", zipPath);
         const zip = new AdmZip(zipPath);
-        const zipEntries = zip.getEntries();
-        let projectJsonContent = "";
-        for (const entry of zipEntries) {
+        for (const entry of zip.getEntries()) {
           if (entry.entryName === "project.json") {
-            projectJsonContent = entry.getData().toString("utf8");
+            projectJson = entry.getData().toString("utf8");
             break;
           }
         }
-        if (projectJsonContent) {
-          console.log("Extracted project.json content:", projectJsonContent);
-        } else {
-          console.log("project.json not found in the zip file");
-        }
+        console.log("Extracted project.json:", projectJson);
       } else {
         console.log("SB3 file not found at:", sb3Path);
       }
@@ -50,21 +39,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
-    // Proceed with OpenAI call (if needed)
     const completion = await openai.chat.completions.create({
+      model: "meta-llama/llama-4-maverick",
       messages: [
         {
           role: "system",
-          content: "", // Add system instructions if necessary.
+          content:
+            "You are given a valid JSON file of a Scratch project. Return a JSON file and nothing else.",
         },
-        { role: "user", content: message },
+        {
+          role: "user",
+          content: `${message}\n\n${projectJson}`.trim(),
+        },
       ],
-      model: "gpt-4-turbo-preview",
       temperature: 0.3,
     });
 
-    // Extract the assistant's reply
-    const reply = completion?.choices?.[0]?.message?.content || "";
+    // Use the returned choices directly.
+    const reply = completion.choices?.[0]?.message?.content || "";
+    console.log("LLama reply:", reply);
     return NextResponse.json({ message: reply });
   } catch (error) {
     console.error("Error:", error);
