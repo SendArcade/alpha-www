@@ -15,21 +15,23 @@ export async function POST(req: Request) {
     console.log("Received SB3 URL:", sb3Url);
 
     let projectJson = "";
+    let zipPath = "";
     if (sb3Url) {
       const relPath = sb3Url.startsWith("/") ? sb3Url.substring(1) : sb3Url;
       const sb3Path = path.join(process.cwd(), "public", relPath);
       if (fs.existsSync(sb3Path)) {
-        const zipPath = sb3Path.replace(/\.sb3$/, ".zip");
+        // Rename the .sb3 file to .zip
+        zipPath = sb3Path.replace(/\.sb3$/, ".zip");
         await fs.promises.rename(sb3Path, zipPath);
         console.log("Renamed file to", zipPath);
+
+        // Open the zip and extract project.json content
         const zip = new AdmZip(zipPath);
-        for (const entry of zip.getEntries()) {
-          if (entry.entryName === "project.json") {
-            projectJson = entry.getData().toString("utf8");
-            break;
-          }
+        const projEntry = zip.getEntry("project.json");
+        if (projEntry) {
+          projectJson = projEntry.getData().toString("utf8");
         }
-        console.log("Extracted project.json:", projectJson);
+        // console.log("Extracted project.json:", projectJson);
       } else {
         console.log("SB3 file not found at:", sb3Path);
       }
@@ -45,19 +47,46 @@ export async function POST(req: Request) {
         {
           role: "system",
           content:
-            "You are given a valid JSON file of a Scratch project. Return a JSON file and nothing else.",
+            `You are provided with a valid JSON file representing a Scratch project. Apply the user's requested modifications with minimal changes, ensuring that the final output is a complete, valid, and parsable JSON file just as the one I sent and having all the things it had. "Return only the modified JSON file" without any additional text, comments, or explanations. JSON file: ${projectJson}`,
         },
         {
           role: "user",
-          content: `${message}\n\n${projectJson}`.trim(),
+          content: `${message}`.trim(),
         },
       ],
       temperature: 0.3,
     });
 
-    // Use the returned choices directly.
     const reply = completion.choices?.[0]?.message?.content || "";
-    console.log("LLama reply:", reply);
+    console.log("LLama reply (new project.json):", reply);
+
+    // Repackage: update project.json inside the zip with the full new JSON.
+    if (zipPath) {
+      // Open the existing zip archive.
+      const zip = new AdmZip(zipPath);
+      // Delete any existing "project.json" entry.
+      zip.deleteFile("project.json");
+      // Add the new project.json with the full reply.
+      zip.addFile("project.json", Buffer.from(reply, "utf8"), "New project.json content");
+      // Write the updated ZIP back to disk.
+      zip.writeZip(zipPath);
+
+      // OPTIONAL: Re-read the entry to verify the full content was written.
+      const updatedZip = new AdmZip(zipPath);
+      const updatedEntry = updatedZip.getEntry("project.json");
+      if (updatedEntry) {
+        const updatedContent = updatedEntry.getData().toString("utf8");
+        console.log("Updated project.json content length:", updatedContent.length);
+      } else {
+        console.log("Failed to update project.json in the zip file");
+      }
+
+      // Rename the updated zip file back to .sb3.
+      const newSb3Path = zipPath.replace(/\.zip$/, ".sb3");
+      await fs.promises.rename(zipPath, newSb3Path);
+      console.log("Repacked and renamed file to", newSb3Path);
+    }
+
     return NextResponse.json({ message: reply });
   } catch (error) {
     console.error("Error:", error);
