@@ -47,11 +47,11 @@ export async function POST(req: Request) {
         {
           role: "system",
           content:
-            `You are provided with a valid JSON file representing a Scratch project. Apply the user's requested modifications with minimal changes, ensuring that the final output is a complete, valid, and parsable JSON file just as the one I sent and having all the things it had. "Return only the modified JSON file" without any additional text, comments, or explanations. JSON file: ${projectJson}`,
+            `You are provided with a valid JSON file representing a Scratch project. Make only the requested modifications with minimal changes while preserving all existing properties and structure. Return only the modified, complete JSON file and nothing else. JSON file: ${projectJson}`,
         },
         {
           role: "user",
-          content: `${message}`.trim(),
+          content: message.trim(),
         },
       ],
       temperature: 0.3,
