@@ -9,6 +9,11 @@ const openai = new OpenAI({
 // Define available templates with their URLs
 const TEMPLATES = [
   {
+    name: "Ball Game",
+    url: "https://raw.githubusercontent.com/SendArcade/alpha-www/main/public/games/BallGame.sb3",
+    description: "A very simple ball game."
+  },
+  {
     name: "3D Ping Pong",
     url: "https://raw.githubusercontent.com/SendArcade/alpha-www/main/public/games/3DPingPong.sb3",
     description: "Experience a dynamic 3D ping pong challenge with realistic physics."
