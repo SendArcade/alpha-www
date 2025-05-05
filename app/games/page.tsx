@@ -1,13 +1,10 @@
-import { NextResponse } from "next/server";
-import OpenAI from 'openai';
+"use client";
+import React from "react";
+import SuggestionCard from "@/components/SuggestionCard";
+import Navbar from "@/components/Layout/Navbar";
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// Define available templates with their URLs
-const TEMPLATES = [
+// List of game templates
+const templates = [
   {
     name: "Ball Game",
     url: "https://raw.githubusercontent.com/SendArcade/alpha-www/main/public/games/BallGame.sb3",
@@ -65,62 +62,32 @@ const TEMPLATES = [
   }
 ];
 
-
-export async function POST(req: Request) {
-  try {
-    const { message } = await req.json();
-
-    const completion = await openai.chat.completions.create({
-      messages: [
-        {
-          role: "system",
-          content: `You are a template matcher. Provide 3-4 game template suggestions that best align with the user's request.
-Sort the suggestions by relevance, with the closest match first.
-For each suggestion, respond using the exact URL from this list:
-
-${TEMPLATES.map(t => t.url).join('\n')}
-
-Return your output as a JSON object with a "urls" field, e.g.:
-{
-  "urls": ["url1", "url2", "url3"]
-}
-`
-        },
-        { role: "user", content: message }
-      ],
-      model: "gpt-4-turbo-preview",
-      temperature: 0.3,
-      response_format: { type: "json_object" }
-    });
-
-    const response = JSON.parse(completion.choices[0].message.content || "{}");
-    const suggestedUrls = Array.isArray(response.urls) ? response.urls : [];
-
-    // Validate that all suggested URLs are in our template list
-    const validUrls = suggestedUrls.filter((url: string) => TEMPLATES.some(t => t.url === url));
-    
-    // If we don't have enough valid URLs, add some random ones
-    while (validUrls.length < 3) {
-      const randomTemplate = TEMPLATES[Math.floor(Math.random() * TEMPLATES.length)];
-      if (!validUrls.includes(randomTemplate.url)) {
-        validUrls.push(randomTemplate.url);
-      }
-    }
-
-    // Get template details for each URL
-    const suggestions = validUrls.map((url: string) => {
-      const template = TEMPLATES.find(t => t.url === url);
-      return {
-        url: url,
-        name: template?.name || "Unknown Game",
-        description: template?.description || ""
-      };
-    });
-
-    return NextResponse.json({ suggestions });
-
-  } catch (error) {
-    console.error("Error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
-}
+export default function GamesPage() {
+  return (
+    <div className="min-h-screen bg-gray-900 text-white mt-10">
+      <Navbar />
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-2">All Game Templates</h1>
+          <p className="text-gray-400">Browse and open any of the available sample projects.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {templates.map((t, idx) => (
+            <SuggestionCard
+              key={idx}
+              embedUrl={`https://alpha-gui.vercel.app/embed.html?autoplay&project_url=${encodeURIComponent(
+                t.url
+              )}`}
+              name={t.name}
+              description={t.description}
+              onOpen={() => window.open(
+                `https://alpha-gui.vercel.app/?project_url=${encodeURIComponent(t.url)}`,
+                "_blank"
+              )}
+            />
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+} 

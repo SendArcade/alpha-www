@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import React from "react";
+import SuggestionCard from "./SuggestionCard";
 
 export default function ChatInterface() {
   // Existing chat state for the SB3 file process
@@ -11,6 +13,9 @@ export default function ChatInterface() {
   const [chatHistory, setChatHistory] = useState<
     Array<{ role: "user" | "assistant"; content: string }>
   >([]);
+  const [suggestions, setSuggestions] = useState<Array<{ name: string; description: string; url: string }>>([]);
+  // Store the user's last request text for display under recommendations
+  const [lastRequest, setLastRequest] = useState<string>("");
 
   // New state for the additional chat dialogue
   const [otherMessage, setOtherMessage] = useState("");
@@ -40,15 +45,31 @@ export default function ChatInterface() {
     return shuffled.slice(0, 4);
   };
 
-  // Function to handle suggestion click
-  const handleSuggestionClick = (suggestion: string) => {
+  // State for client-only initial suggestions
+  const [initialSuggestions, setInitialSuggestions] = useState<string[]>([]);
+
+  // Populate initial suggestions only on client after mount
+  useEffect(() => {
+    setInitialSuggestions(getRandomSuggestions());
+  }, []);
+
+  // Function to handle initial suggestion click
+  const handleInitialSuggestionClick = (suggestion: string) => {
     setMessage(suggestion);
   };
 
-  // Function to open the project in Alpha using the local SB3 file
-  const openInAlpha = () => {
-    if (!sb3Url) return;
-    const projectUrl = `${window.location.origin}${sb3Url}`;
+  // Function to handle API suggestion click
+  const handleApiSuggestionClick = (suggestion: { name: string; description: string }) => {
+    setMessage(`I want to build a ${suggestion.name.toLowerCase()}. ${suggestion.description}`);
+  };
+
+  // Function to open the project in Alpha using the local SB3 file or provided URL
+  const openInAlpha = (url?: string) => {
+    const targetUrl = url ?? sb3Url;
+    if (!targetUrl) return;
+    const projectUrl = targetUrl.startsWith('http')
+      ? targetUrl
+      : `${window.location.origin}${targetUrl}`;
     const alphaUrl = `https://alpha-gui.vercel.app/?project_url=${encodeURIComponent(
       projectUrl
     )}`;
@@ -60,6 +81,8 @@ export default function ChatInterface() {
     e.preventDefault();
     if (!message.trim()) return;
 
+    // Store the current request for later display
+    setLastRequest(message);
     // Reset SB3-related state
     setSb3Url(null);
     setFileSize(0);
@@ -74,6 +97,7 @@ export default function ChatInterface() {
       // Call your API endpoint to get the remote SB3 URL and project data.
       const response = await fetch("/api/chat", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message, history: chatHistory }),
       });
@@ -81,6 +105,11 @@ export default function ChatInterface() {
       if (!response.ok) throw new Error("Failed to get response");
 
       const data = await response.json();
+
+      // Update suggestions from the API response
+      if (data.suggestions) {
+        setSuggestions(data.suggestions);
+      }
 
       // Add assistant message to the history (for context)
       const assistantMessage = {
@@ -110,16 +139,6 @@ export default function ChatInterface() {
             .catch((err) => {
               console.error("Error verifying file:", err);
             });
-
-          // Append a note to the assistant's message.
-          setChatHistory((prev) => {
-            const newHistory = [...prev];
-            const lastMessage = newHistory[newHistory.length - 1];
-            if (lastMessage.role === "assistant") {
-              lastMessage.content += `\n\nSB3 file saved locally at ${downloadData.localUrl}`;
-            }
-            return newHistory;
-          });
         }
       }
     } catch (error) {
@@ -211,6 +230,25 @@ export default function ChatInterface() {
               {isLoading ? "Processing..." : "Submit"}
             </button>
 
+            {/* Initial Suggestions Section (client-only) */}
+            {initialSuggestions.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-gray-300 text-sm mb-2">Try these ideas:</h3>
+              <div className="flex flex-wrap gap-2">
+                {initialSuggestions.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleInitialSuggestionClick(suggestion)}
+                    className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-full text-sm transition-colors"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+            )}
+
             {isLoading && (
               <div className="mt-3 text-gray-300">
                 Processing your request...
@@ -235,7 +273,7 @@ export default function ChatInterface() {
                   <div>
                     <h4 className="text-white mb-1">Open in Alpha</h4>
                     <button
-                      onClick={openInAlpha}
+                      onClick={() => openInAlpha()}
                       className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md transition-colors w-full"
                     >
                       Open Project in Alpha
@@ -247,22 +285,32 @@ export default function ChatInterface() {
           </div>
         </form>
 
-        {/* Suggestions Section - Moved outside the form */}
-        <div className="mt-4">
-          <h3 className="text-gray-300 text-sm mb-2">Try these ideas:</h3>
-          <div className="flex flex-wrap gap-2">
-            {getRandomSuggestions().map((suggestion, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => handleSuggestionClick(suggestion)}
-                className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-full text-sm transition-colors"
-              >
-                {suggestion}
-              </button>
-            ))}
+        {/* Dynamic Suggestions Section */}
+        {suggestions.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-xl text-white font-medium mb-4">Recommended Templates</h3>
+            {/* Show original user request directly below heading */}
+            {lastRequest && (
+              <div className="mb-4 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                <h4 className="text-gray-300 text-sm mb-1">Your request:</h4>
+                <p className="text-white font-mono text-sm">{lastRequest}</p>
+              </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {suggestions.map((sugg, idx) => (
+                <SuggestionCard
+                  key={idx}
+                  embedUrl={`https://alpha-gui.vercel.app/embed.html?autoplay&project_url=${encodeURIComponent(
+                    sugg.url
+                  )}`}
+                  name={sugg.name}
+                  description={sugg.description}
+                  onOpen={() => openInAlpha(sugg.url)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Additional Chat Dialogue - Temporarily Commented Out
