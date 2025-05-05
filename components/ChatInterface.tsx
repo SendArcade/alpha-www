@@ -19,6 +19,32 @@ export default function ChatInterface() {
     Array<{ role: "user" | "assistant"; content: string }>
   >([]);
 
+  // Game templates with simple suggestions
+  const gameTemplates = [
+    "Make a Mario game",
+    "Create a Space Shooter",
+    "Build a Flappy Bird clone",
+    "Make a Brick Breaker game",
+    "Create an Endless Runner",
+    "Build a 3D Ping Pong game",
+    "Make a Hill Climb Racing game",
+    "Create a Memory Card game",
+    "Build a Whack-A-Mole game",
+    "Make a Ball Game",
+    "Create a Maze Game"
+  ];
+
+  // Get random suggestions
+  const getRandomSuggestions = () => {
+    const shuffled = [...gameTemplates].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 4);
+  };
+
+  // Function to handle suggestion click
+  const handleSuggestionClick = (suggestion: string) => {
+    setMessage(suggestion);
+  };
+
   // Function to open the project in Alpha using the local SB3 file
   const openInAlpha = () => {
     if (!sb3Url) return;
@@ -220,16 +246,32 @@ export default function ChatInterface() {
             )}
           </div>
         </form>
+
+        {/* Suggestions Section - Moved outside the form */}
+        <div className="mt-4">
+          <h3 className="text-gray-300 text-sm mb-2">Try these ideas:</h3>
+          <div className="flex flex-wrap gap-2">
+            {getRandomSuggestions().map((suggestion, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => handleSuggestionClick(suggestion)}
+                className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-full text-sm transition-colors"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Additional Chat Dialogue */}
+      {/* Additional Chat Dialogue - Temporarily Commented Out
       {sb3Url && (
         <div className="w-full bg-gray-800/50 rounded-lg backdrop-blur-sm border border-gray-700 p-6">
           <h2 className="text-xl text-white font-medium mb-4">
             Additional Chat Dialogue
           </h2>
 
-          {/* Display the additional chat history */}
           <div className="mb-4 max-h-64 overflow-y-auto">
             {otherChatHistory.map((msg, index) => (
               <div
@@ -263,6 +305,7 @@ export default function ChatInterface() {
           </form>
         </div>
       )}
+      */}
     </div>
   );
 }

@@ -87,7 +87,7 @@ export async function POST(req: Request) {
       console.log("Repacked and renamed file to", newSb3Path);
     }
 
-    return NextResponse.json({ message: reply });
+    return NextResponse.json({ message: "Done" });
   } catch (error) {
     console.error("Error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
